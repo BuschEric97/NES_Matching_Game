@@ -1,0 +1,5 @@
+*.o
+*.nes
+*.nes.dbg
+*.nes.deb
+*.map.txt
