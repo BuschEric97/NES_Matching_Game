@@ -162,6 +162,14 @@ game_loop:
     bne a_not_pressed
         lda SHOWCARDSBUFFER
         bne a_not_pressed   ; don't allow button A actions when buffer is greater than 0
+        lda CURSORXPOS
+        sta CARDXPOS
+        lda CURSORYPOS
+        sta CARDYPOS
+        lda #1
+        sta GETCARDFLAG
+        jsr get_set_card_id
+        beq a_not_pressed   ; don't allow button A actions when cursor on empty spot
         lda DRAWCARD0
         bne card_1_select
         ;card_0_select:
