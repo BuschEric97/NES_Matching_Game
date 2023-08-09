@@ -45,10 +45,38 @@ game_loop:
         ; check if DRAWCARD1 is set, if so erase both cards
         lda DRAWCARD1
         beq buffer_finished
-            lda #0
-            sta DRAWCARD0
-            sta DRAWCARD1
-            jsr draw_cards
+            lda CARD0ID
+            cmp CARD1ID
+            bne cards_not_match ; erase background cards and update GAMEBOARDDATA if cards match
+                ; erase card 0's background card and set its card ID to 0
+                lda CARD0XPOS
+                sta BGCARDXPOS
+                sta CARDXPOS
+                lda CARD0YPOS
+                sta BGCARDYPOS
+                sta CARDYPOS
+                lda #0
+                sta DRAWBGCARD
+                sta GETCARDFLAG
+                jsr draw_bg_card
+                jsr get_set_card_id
+                ; erase card 1's background card and set its card ID to 0
+                lda CARD1XPOS
+                sta BGCARDXPOS
+                sta CARDXPOS
+                lda CARD1YPOS
+                sta BGCARDYPOS
+                sta CARDYPOS
+                lda #0
+                sta DRAWBGCARD
+                sta GETCARDFLAG
+                jsr draw_bg_card
+                jsr get_set_card_id
+            cards_not_match:
+                lda #0
+                sta DRAWCARD0
+                sta DRAWCARD1
+                jsr draw_cards
             ; TODO: check if cards match, if so update GAMEBOARDDATA and background cards
     buffer_finished:
 
