@@ -205,20 +205,6 @@ game_loop:
             jsr draw_cards
     a_not_pressed:
 
-    ; see if button B was pressed
-    lda gamepad_new_press
-    and PRESS_B
-    cmp PRESS_B
-    bne b_not_pressed
-        lda CURSORXPOS
-        sta BGCARDXPOS
-        lda CURSORYPOS
-        sta BGCARDYPOS
-        lda #0
-        sta DRAWBGCARD
-        jsr draw_bg_card
-    b_not_pressed:
-
     ; see if button START was pressed
     lda gamepad_new_press
     and PRESS_START
