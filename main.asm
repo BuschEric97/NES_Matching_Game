@@ -113,6 +113,8 @@ game_loop:
     bne a_not_pressed
         lda SHOWCARDSBUFFER
         bne a_not_pressed   ; don't allow button A actions when buffer is greater than 0
+        lda DRAWCARD1
+        bne a_not_pressed   ; don't allow button A actions when both cards are visible
         lda CURSORXPOS
         sta CARDXPOS
         lda CURSORYPOS
