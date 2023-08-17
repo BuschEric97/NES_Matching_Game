@@ -240,6 +240,17 @@ draw_cursor:
 
     rts 
 
+erase_cursor:
+    lda #0
+    sta $0200
+    sta $0201
+    sta $0202
+    sta $0203
+
+    jsr draw_sprites
+
+    rts 
+
 draw_sprites:
     ; wait for vblank
     bit $2002

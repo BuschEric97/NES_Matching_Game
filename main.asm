@@ -35,6 +35,7 @@ game_loop:
     ; get gamepad input
     jsr set_gamepad
 
+    ; skip cursor code when game is not running
     lda GAMEFLAG
     beq skip_cursor
 
