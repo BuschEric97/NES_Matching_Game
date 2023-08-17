@@ -4,6 +4,7 @@
 .segment "ZEROPAGE"
     GAMEBOARDDATA: .res 140     ; 1 byte for each card on the board (a card ID of $00 means the card is gone)
     SHOWCARDSBUFFER: .res 1     ; When greater than 0, decrement and skip game logic (in order to show the selected cards)
+    GAMEFLAG: .res 1            ; Flag to indicate when a game is being played
 
 .segment "VARS"
 
@@ -33,6 +34,9 @@ game_loop:
 
     ; get gamepad input
     jsr set_gamepad
+
+    lda GAMEFLAG
+    beq skip_cursor
 
     ;-------------------;
     ; Move Cursor Code  ;
@@ -100,8 +104,9 @@ game_loop:
             sta CURSORXPOS
     right_not_pressed:
 
-    ; always draw the cursor
+    ; always draw the cursor when a game is being played
     jsr draw_cursor
+    skip_cursor:
 
     ;---------------------------;
     ; A Button Handling Code    ;
@@ -171,8 +176,13 @@ game_loop:
     and PRESS_START
     cmp PRESS_START
     bne start_not_pressed
-        jsr clear_board
-        jsr generate_board
+        lda GAMEFLAG
+        bne start_not_pressed   ; don't allow button START actions when game is being played
+            jsr clear_board
+            jsr generate_board
+            jsr draw_board
+            lda #1
+            sta GAMEFLAG    ; set GAMEFLAG to 1 to indicate a game is being played
     start_not_pressed:
 
     ;---------------------------;
