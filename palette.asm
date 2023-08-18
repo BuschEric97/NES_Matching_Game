@@ -72,7 +72,7 @@ MEDIUM_GRAY2 = $3d
 palette_background:
 .byte DARK_CHARTREUSE,  BLACK,      DARK_RED,       MEDIUM_GRAY
 .byte DARK_CHARTREUSE,  DARK_BLUE,  MEDIUM_BLUE,    LIGHT_BLUE
-.byte BLACK,            DARK_BLUE,  MEDIUM_BLUE,    LIGHT_BLUE
+.byte DARK_CHARTREUSE,  BLACK,      DARK_BLUE,      MEDIUM_BLUE
 .byte BLACK,            DARK_GRAY,  MEDIUM_GRAY,    LIGHTEST_GRAY
 
 palette_sprites:
