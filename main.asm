@@ -5,7 +5,6 @@
     GAMEBOARDDATA: .res 140     ; 1 byte for each card on the board (a card ID of $00 means the card is gone)
     SHOWCARDSBUFFER: .res 1     ; When greater than 0, decrement and skip game logic (in order to show the selected cards)
     GAMEFLAG: .res 1            ; Flag to indicate when a game is being played
-    SCOREHITS: .res 1           ; Variable to track how many successful matches have been made
     SCOREMISSES: .res 2         ; Variable to track how many unsuccessful matches have been made
 
 .segment "VARS"
@@ -229,11 +228,7 @@ game_loop:
                 sta GETCARDFLAG
                 jsr draw_bg_card
                 jsr get_set_card_id
-                ; increment hits score
-                lda SCOREHITS
-                clc 
-                adc #1
-                sta SCOREHITS
+                ; skip incrementing misses score
                 jmp card_check_finish
             cards_not_match:
                 ; increment misses score
