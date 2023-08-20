@@ -233,6 +233,7 @@ game_loop:
             cards_not_match:
                 ; increment misses score
                 jsr increment_score
+                jsr draw_score
             card_check_finish:
                 ; erase the drawn card sprites
                 lda #0
