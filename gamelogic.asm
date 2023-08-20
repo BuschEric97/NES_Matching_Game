@@ -108,3 +108,49 @@ generate_board:
         bne loop_thru_board
 
     rts 
+
+increment_score:
+    ;increment_ones:
+    lda SCOREMISSES
+    clc 
+    adc #1
+    sta SCOREMISSES
+    cmp #10
+    bne done_increment
+        ;increment_tens:
+        ; set ones place to 0
+        lda #0
+        sta SCOREMISSES
+        lda SCOREMISSES+1
+        clc 
+        adc #1
+        sta SCOREMISSES+1
+        cmp #10
+        bne done_increment
+            ;increment_hundreds:
+            ; set tens place to 0
+            lda #0
+            sta SCOREMISSES+1
+            lda SCOREMISSES+2
+            clc 
+            adc #1
+            sta SCOREMISSES+2
+            cmp #10
+            bne done_increment
+                ;increment_thousands:
+                ; set hundreds place to 0
+                lda #0
+                sta SCOREMISSES+2
+                lda SCOREMISSES+3
+                clc 
+                adc #1
+                sta SCOREMISSES+3
+                cmp #10
+                bne done_increment
+                    ; set thousands place back to 9
+                    lda #9
+                    sta SCOREMISSES+3
+
+    done_increment:
+    
+    rts 
