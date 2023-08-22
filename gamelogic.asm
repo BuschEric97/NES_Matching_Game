@@ -3,6 +3,10 @@
     CARDYPOS: .res 1
     GETCARDFLAG: .res 1
 
+    CURSORNEWDIR: .res 1    ; #0 == UP, #1 == RIGHT, #2 == DOWN, #3 == LEFT
+    CURSORNEWX: .res 1
+    CURSORNEWY: .res 1
+
     BRDCARDID: .res 1
     BRDCARDSPOT: .res 1
     BRDGENINDEX: .res 1
@@ -33,6 +37,86 @@ get_set_card_id:
         sta GAMEBOARDDATA, x
 
     get_set_card_done:
+    rts 
+
+set_new_cursor_pos:
+    ; set initial new position
+    lda CURSORXPOS
+    sta CURSORNEWX
+    lda CURSORYPOS
+    sta CURSORNEWY
+
+    lda CURSORNEWDIR
+    bne not_moving_up
+        ;moving_up:
+        ; get next position to check
+        lda CURSORNEWY
+        beq up_limit
+            sec 
+            sbc #1
+            sta CURSORNEWY
+            jmp set_up
+        up_limit:
+            lda #9
+            sta CURSORNEWY
+        set_up:
+        jmp write_to_cursor
+    not_moving_up:
+    lda CURSORNEWDIR
+    cmp #1
+    bne not_moving_right
+        ;moving_right:
+        ; get next position to check
+        lda CURSORNEWX
+        cmp #13
+        beq right_limit
+            clc 
+            adc #1
+            sta CURSORNEWX
+            jmp set_right
+        right_limit:
+            lda #0
+            sta CURSORNEWX
+        set_right:
+        jmp write_to_cursor
+    not_moving_right:
+    lda CURSORNEWDIR
+    cmp #2
+    bne not_moving_down
+        ;moving_down
+        ; get next position to check
+        lda CURSORNEWY
+        cmp #9
+        beq down_limit
+            clc  
+            adc #1
+            sta CURSORNEWY
+            jmp set_down
+        down_limit:
+            lda #0
+            sta CURSORNEWY
+        set_down:
+        jmp write_to_cursor
+    not_moving_down:
+        ;moving_left:
+        ; get next position to check
+        lda CURSORNEWX
+        beq left_limit
+            sec 
+            sbc #1
+            sta CURSORNEWX
+            jmp set_left
+        left_limit:
+            lda #13
+            sta CURSORNEWX
+        set_left:
+
+    write_to_cursor:
+        lda CURSORNEWX
+        sta CURSORXPOS
+        lda CURSORNEWY
+        sta CURSORYPOS
+    skip_write_to_cursor:
     rts 
 
 clear_board:

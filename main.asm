@@ -48,63 +48,37 @@ game_loop:
     and PRESS_UP
     cmp PRESS_UP
     bne up_not_pressed
-        lda CURSORYPOS
-        cmp #0
-        beq up_limit
-            sbc #1
-            jmp set_up
-        up_limit:
-            lda #9
-        set_up:
-            sta CURSORYPOS
+        lda #0
+        sta CURSORNEWDIR
+        jsr set_new_cursor_pos
     up_not_pressed:
+    ; see if dpad RIGHT was pressed
+    lda gamepad_new_press
+    and PRESS_RIGHT
+    cmp PRESS_RIGHT
+    bne right_not_pressed
+        lda #1
+        sta CURSORNEWDIR
+        jsr set_new_cursor_pos
+    right_not_pressed:
     ; see if dpad DOWN was pressed
     lda gamepad_new_press
     and PRESS_DOWN
     cmp PRESS_DOWN
     bne down_not_pressed
-        lda CURSORYPOS
-        cmp #9
-        beq down_limit
-            clc 
-            adc #1
-            jmp set_down
-        down_limit:
-            lda #0
-        set_down:
-            sta CURSORYPOS
+        lda #2
+        sta CURSORNEWDIR
+        jsr set_new_cursor_pos
     down_not_pressed:
     ; see if dpad LEFT was pressed
     lda gamepad_new_press
     and PRESS_LEFT
     cmp PRESS_LEFT
     bne left_not_pressed
-        lda CURSORXPOS
-        cmp #0
-        beq left_limit
-            sbc #1
-            jmp set_left
-        left_limit:
-            lda #13
-        set_left:
-            sta CURSORXPOS
+        lda #3
+        sta CURSORNEWDIR
+        jsr set_new_cursor_pos
     left_not_pressed:
-    ; see if dpad RIGHT was pressed
-    lda gamepad_new_press
-    and PRESS_RIGHT
-    cmp PRESS_RIGHT
-    bne right_not_pressed
-        lda CURSORXPOS
-        cmp #13
-        beq right_limit
-            clc 
-            adc #1
-            jmp set_right
-        right_limit:
-            lda #0
-        set_right:
-            sta CURSORXPOS
-    right_not_pressed:
 
     ; always draw the cursor when a game is being played
     jsr draw_cursor
