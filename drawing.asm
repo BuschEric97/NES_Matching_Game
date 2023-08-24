@@ -553,29 +553,81 @@ draw_board:
         sta $2006               ; write the low byte of $2000 address
     ldx #$00                    ; start out at 0
     load_board_background_loop_0:
-        lda background_data_full_board, x   ; load data from address (background + the value in x register)
+        lda background_data_board_top, x   ; load data from address (background + the value in x register)
         sta $2007               ; write to PPU
         inx                     ; increment x by 1
-        cpx #$00                ; compare x to hex $00 - copying 256 bytes
+        cpx #$80                ; compare x to hex $00 - copying 256 bytes
         bne load_board_background_loop_0
+    ldx #$00
     load_board_background_loop_1:     ; loop for 2nd set of background data
-        lda background_data_full_board+256, x
+        lda background_data_card_rows, x
         sta $2007
         inx 
-        cpx #$00
+        cpx #$80
         bne load_board_background_loop_1
+    ldx #$00
     load_board_background_loop_2:     ; loop for 3rd set of background data
-        lda background_data_full_board+512, x
+        lda LEVELFLAG
+        cmp #1
+        bpl background_data_level_1
+            lda background_data_empty_rows, x
+            jmp draw_loop_2
+        background_data_level_1:
+            lda background_data_card_rows, x
+        draw_loop_2:
         sta $2007
         inx 
-        cpx #$00
+        cpx #$80
         bne load_board_background_loop_2
-    load_board_background_loop_3:     ; loop for 4th set of background data
-        lda background_data_full_board+768, x
+    ldx #$00
+    load_board_background_loop_3:     ; loop for 3rd set of background data
+        lda LEVELFLAG
+        cmp #2
+        bpl background_data_level_2
+            lda background_data_empty_rows, x
+            jmp draw_loop_3
+        background_data_level_2:
+            lda background_data_card_rows, x
+        draw_loop_3:
+        sta $2007
+        inx 
+        cpx #$80
+        bne load_board_background_loop_3
+    ldx #$00
+    load_board_background_loop_4:     ; loop for 3rd set of background data
+        lda LEVELFLAG
+        cmp #3
+        bpl background_data_level_3
+            lda background_data_empty_rows, x
+            jmp draw_loop_4
+        background_data_level_3:
+            lda background_data_card_rows, x
+        draw_loop_4:
+        sta $2007
+        inx 
+        cpx #$80
+        bne load_board_background_loop_4
+    ldx #$00
+    load_board_background_loop_5:     ; loop for 3rd set of background data
+        lda LEVELFLAG
+        cmp #4
+        bpl background_data_level_4
+            lda background_data_empty_rows, x
+            jmp draw_loop_5
+        background_data_level_4:
+            lda background_data_card_rows, x
+        draw_loop_5:
+        sta $2007
+        inx 
+        cpx #$80
+        bne load_board_background_loop_5
+    ldx #$00
+    load_board_background_loop_6:     ; loop for 4th set of background data
+        lda background_data_board_bottom, x
         sta $2007
         inx 
         cpx #$C0
-        bne load_board_background_loop_3
+        bne load_board_background_loop_6
 
     load_board_attributes:
         lda $2002               ; read PPU status to reset the high/low latch
@@ -605,37 +657,31 @@ draw_board:
 
 ;------------------------------------------------------ actual playable area of board: 28 x 20 byte grid (14 x 10 cards)
 
-background_data_full_board:
+background_data_board_top:
     .byte $3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E
     .byte $3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E
     .byte $3E,$08,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$0C,$09,$3E
     .byte $3E,$0E,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$0F,$3E
+
+background_data_card_rows:
     .byte $3E,$0E,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$0F,$3E
     .byte $3E,$0E,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$0F,$3E
     .byte $3E,$0E,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$0F,$3E
     .byte $3E,$0E,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$0F,$3E
-    .byte $3E,$0E,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$0F,$3E
-    .byte $3E,$0E,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$0F,$3E
-    .byte $3E,$0E,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$0F,$3E
-    .byte $3E,$0E,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$0F,$3E
-    .byte $3E,$0E,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$0F,$3E
-    .byte $3E,$0E,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$0F,$3E
-    .byte $3E,$0E,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$0F,$3E
-    .byte $3E,$0E,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$0F,$3E
-    .byte $3E,$0E,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$0F,$3E
-    .byte $3E,$0E,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$0F,$3E
-    .byte $3E,$0E,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$0F,$3E
-    .byte $3E,$0E,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$0F,$3E
-    .byte $3E,$0E,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$0F,$3E
-    .byte $3E,$0E,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$0F,$3E
-    .byte $3E,$0E,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$00,$01,$0F,$3E
-    .byte $3E,$0E,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$02,$03,$0F,$3E
+
+background_data_board_bottom:
     .byte $3E,$0E,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$0F,$3E
     .byte $3E,$0E,$3F,$3F,$3F,$3F,$15,$10,$18,$1B,$14,$13,$3F,$1C,$10,$23,$12,$17,$14,$22,$3D,$3F,$30,$30,$30,$30,$3F,$3F,$3F,$3F,$0F,$3E
     .byte $3E,$0E,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$0F,$3E
     .byte $3E,$0A,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0D,$0B,$3E
     .byte $3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E
     .byte $3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E,$3E
+
+background_data_empty_rows:
+    .byte $3E,$0E,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$0F,$3E
+    .byte $3E,$0E,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$0F,$3E
+    .byte $3E,$0E,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$0F,$3E
+    .byte $3E,$0E,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$3F,$0F,$3E
 
 bg_attributes:
     .byte %01010101, %01010101, %01010101, %01010101, %01010101, %01010101, %01010101, %01010101

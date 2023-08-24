@@ -15,6 +15,7 @@
     BRDCARDSPOT: .res 1
     BRDGENINDEX: .res 1
     BRDLOOPLIMIT: .res 1
+    BRDNUMCARDS: .res 1
 
 .segment "CODE"
 
@@ -63,7 +64,7 @@ set_new_cursor_pos:
             sta CURSORNEWY
             jmp set_up
         up_limit:
-            lda #9
+            lda DOWNLIMIT
             sta CURSORNEWY
         set_up:
         jmp write_to_cursor
@@ -81,7 +82,7 @@ set_new_cursor_pos:
             sta CURSORNEWX
             jmp set_right
         right_limit:
-            lda #0
+            lda LEFTLIMIT
             sta CURSORNEWX
         set_right:
         jmp write_to_cursor
@@ -99,7 +100,7 @@ set_new_cursor_pos:
             sta CURSORNEWY
             jmp set_down
         down_limit:
-            lda #0
+            lda UPLIMIT
             sta CURSORNEWY
         set_down:
         jmp write_to_cursor
@@ -114,7 +115,7 @@ set_new_cursor_pos:
             sta CURSORNEWX
             jmp set_left
         left_limit:
-            lda #13
+            lda RIGHTLIMIT
             sta CURSORNEWX
         set_left:
 
@@ -136,6 +137,9 @@ clear_board:
         bne loop_thru_clear_board
 
 generate_board:
+    lda BRDNUMCARDS
+    lsr A
+    sta BRDLOOPLIMIT
     lda #0
     sta BRDCARDID
     sta BRDCARDSPOT
@@ -148,13 +152,14 @@ generate_board:
     
         ; find an empty first spot on the board
         spot_0:
+            ; get random number modulus the number of card slots on the board
             jsr prng 
             sec 
             gen_brd_mod_0:
-            sbc #140
+            sbc BRDNUMCARDS
             bcs gen_brd_mod_0
-            adc #140
-            sta BRDCARDSPOT
+            adc BRDNUMCARDS
+
             tax 
             sta BRDCARDSPOT
             lda GAMEBOARDDATA, x
@@ -173,13 +178,14 @@ generate_board:
 
         ; find an empty second spot on the board
         spot_1:
+            ; get random number modulus the number of card slots on the board
             jsr prng 
             sec 
             gen_brd_mod_1:
-            sbc #140
+            sbc BRDNUMCARDS
             bcs gen_brd_mod_1
-            adc #140
-            sta BRDCARDSPOT
+            adc BRDNUMCARDS
+
             tax 
             sta BRDCARDSPOT
             lda GAMEBOARDDATA, x
@@ -254,7 +260,7 @@ initialize_level_vars:
         sta UPLIMIT
         lda #13
         sta RIGHTLIMIT
-        lda #9
+        lda #1
         sta DOWNLIMIT
         lda #0
         sta LEFTLIMIT
@@ -262,8 +268,8 @@ initialize_level_vars:
         sta CURSORXPOS
         lda #0
         sta CURSORYPOS
-        lda #70
-        sta BRDLOOPLIMIT
+        lda #28
+        sta BRDNUMCARDS
         jmp done_inits
     level_not_0:
     lda LEVELFLAG
@@ -274,7 +280,7 @@ initialize_level_vars:
         sta UPLIMIT
         lda #13
         sta RIGHTLIMIT
-        lda #9
+        lda #3
         sta DOWNLIMIT
         lda #0
         sta LEFTLIMIT
@@ -282,8 +288,8 @@ initialize_level_vars:
         sta CURSORXPOS
         lda #0
         sta CURSORYPOS
-        lda #70
-        sta BRDLOOPLIMIT
+        lda #56
+        sta BRDNUMCARDS
         jmp done_inits
     level_not_1:
     lda LEVELFLAG
@@ -294,7 +300,7 @@ initialize_level_vars:
         sta UPLIMIT
         lda #13
         sta RIGHTLIMIT
-        lda #9
+        lda #5
         sta DOWNLIMIT
         lda #0
         sta LEFTLIMIT
@@ -302,8 +308,8 @@ initialize_level_vars:
         sta CURSORXPOS
         lda #0
         sta CURSORYPOS
-        lda #70
-        sta BRDLOOPLIMIT
+        lda #84
+        sta BRDNUMCARDS
         jmp done_inits
     level_not_2:
     lda LEVELFLAG
@@ -314,7 +320,7 @@ initialize_level_vars:
         sta UPLIMIT
         lda #13
         sta RIGHTLIMIT
-        lda #9
+        lda #7
         sta DOWNLIMIT
         lda #0
         sta LEFTLIMIT
@@ -322,8 +328,8 @@ initialize_level_vars:
         sta CURSORXPOS
         lda #0
         sta CURSORYPOS
-        lda #70
-        sta BRDLOOPLIMIT
+        lda #112
+        sta BRDNUMCARDS
         jmp done_inits
     level_not_3:
         ; max level
@@ -339,8 +345,8 @@ initialize_level_vars:
         sta CURSORXPOS
         lda #0
         sta CURSORYPOS
-        lda #70
-        sta BRDLOOPLIMIT
+        lda #140
+        sta BRDNUMCARDS
     
     done_inits:
         rts 
