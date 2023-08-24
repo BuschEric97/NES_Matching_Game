@@ -155,20 +155,12 @@ game_loop:
     bne start_not_pressed
         lda GAMEFLAG
         bne start_not_pressed   ; don't allow button START actions when game is being played
+            jsr initialize_level_vars
             jsr clear_board
             jsr generate_board
             jsr draw_board
             lda #1
             sta GAMEFLAG    ; set GAMEFLAG to 1 to indicate a game is being played
-
-            ; set max level board limits
-            lda #0
-            sta UPLIMIT
-            sta LEFTLIMIT
-            lda #13
-            sta RIGHTLIMIT
-            lda #9
-            sta DOWNLIMIT
     start_not_pressed:
 
     lda gamepad_new_press

@@ -14,6 +14,7 @@
     BRDCARDID: .res 1
     BRDCARDSPOT: .res 1
     BRDGENINDEX: .res 1
+    BRDLOOPLIMIT: .res 1
 
 .segment "CODE"
 
@@ -194,7 +195,7 @@ generate_board:
         ldy BRDGENINDEX
         iny 
         sty BRDGENINDEX
-        cpy #70
+        cpy BRDLOOPLIMIT
         bne loop_thru_board
 
     rts 
@@ -244,3 +245,102 @@ increment_score:
     done_increment:
     
     rts 
+
+initialize_level_vars:
+    lda LEVELFLAG
+    bne level_not_0
+        ; level 0
+        lda #0
+        sta UPLIMIT
+        lda #13
+        sta RIGHTLIMIT
+        lda #9
+        sta DOWNLIMIT
+        lda #0
+        sta LEFTLIMIT
+        lda #0
+        sta CURSORXPOS
+        lda #0
+        sta CURSORYPOS
+        lda #70
+        sta BRDLOOPLIMIT
+        jmp done_inits
+    level_not_0:
+    lda LEVELFLAG
+    cmp #1
+    bne level_not_1
+        ; level 1
+        lda #0
+        sta UPLIMIT
+        lda #13
+        sta RIGHTLIMIT
+        lda #9
+        sta DOWNLIMIT
+        lda #0
+        sta LEFTLIMIT
+        lda #0
+        sta CURSORXPOS
+        lda #0
+        sta CURSORYPOS
+        lda #70
+        sta BRDLOOPLIMIT
+        jmp done_inits
+    level_not_1:
+    lda LEVELFLAG
+    cmp #2
+    bne level_not_2
+        ; level 2
+        lda #0
+        sta UPLIMIT
+        lda #13
+        sta RIGHTLIMIT
+        lda #9
+        sta DOWNLIMIT
+        lda #0
+        sta LEFTLIMIT
+        lda #0
+        sta CURSORXPOS
+        lda #0
+        sta CURSORYPOS
+        lda #70
+        sta BRDLOOPLIMIT
+        jmp done_inits
+    level_not_2:
+    lda LEVELFLAG
+    cmp #3
+    bne level_not_3
+        ; level 3
+        lda #0
+        sta UPLIMIT
+        lda #13
+        sta RIGHTLIMIT
+        lda #9
+        sta DOWNLIMIT
+        lda #0
+        sta LEFTLIMIT
+        lda #0
+        sta CURSORXPOS
+        lda #0
+        sta CURSORYPOS
+        lda #70
+        sta BRDLOOPLIMIT
+        jmp done_inits
+    level_not_3:
+        ; max level
+        lda #0
+        sta UPLIMIT
+        lda #13
+        sta RIGHTLIMIT
+        lda #9
+        sta DOWNLIMIT
+        lda #0
+        sta LEFTLIMIT
+        lda #0
+        sta CURSORXPOS
+        lda #0
+        sta CURSORYPOS
+        lda #70
+        sta BRDLOOPLIMIT
+    
+    done_inits:
+        rts 
