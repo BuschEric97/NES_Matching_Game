@@ -5,6 +5,7 @@
     GAMEBOARDDATA: .res 140     ; 1 byte for each card on the board (a card ID of $00 means the card is gone)
     SHOWCARDSBUFFER: .res 1     ; When greater than 0, decrement and skip game logic (in order to show the selected cards)
     GAMEFLAG: .res 1            ; Flag to indicate when a game is being played
+    LEVELFLAG: .res 1           ; Variable to indicate which difficulty the game is being played at
     SCOREMISSES: .res 4         ; Variable to track how many unsuccessful matches have been made
 
 .segment "VARS"
@@ -169,6 +170,26 @@ game_loop:
             lda #9
             sta DOWNLIMIT
     start_not_pressed:
+
+    lda gamepad_new_press
+    and PRESS_SELECT
+    cmp PRESS_SELECT
+    bne select_not_pressed
+        lda GAMEFLAG
+        bne select_not_pressed  ; don't allow button SELECT actions when game is being played
+            lda LEVELFLAG
+            cmp #4
+            beq level_limit
+                lda LEVELFLAG
+                clc 
+                adc #1
+                jmp set_level
+            level_limit:
+                lda #0
+            set_level:
+                sta LEVELFLAG
+                jsr draw_level_select
+    select_not_pressed:
 
     ;---------------------------;
     ; Show Cards Buffer Code    ;

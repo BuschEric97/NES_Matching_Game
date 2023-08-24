@@ -501,6 +501,39 @@ draw_score:
 
     rts 
 
+draw_level_select:
+    ; wait for vblank
+    bit $2002
+    vblank_wait_level:
+        bit $2002
+        bpl vblank_wait_level
+
+    ; disable sprites and background rendering
+    lda #%00000000
+    sta $2001
+
+    lda $2002
+    lda #$22
+    sta $2006
+    lda #$B3
+    sta $2006
+
+    lda LEVELFLAG
+    clc 
+    adc #$30
+    sta $2007
+
+    ; enable sprites and background rendering
+    lda #%00011110
+    sta $2001
+
+    ; reset scrolling
+    lda #$00
+    sta $2005
+    sta $2005
+
+    rts 
+
 draw_board:
     ; wait for vblank
     bit $2002
