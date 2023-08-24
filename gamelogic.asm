@@ -6,6 +6,10 @@
     CURSORNEWDIR: .res 1    ; #0 == UP, #1 == RIGHT, #2 == DOWN, #3 == LEFT
     CURSORNEWX: .res 1
     CURSORNEWY: .res 1
+    UPLIMIT: .res 1
+    RIGHTLIMIT: .res 1
+    DOWNLIMIT: .res 1
+    LEFTLIMIT: .res 1
 
     BRDCARDID: .res 1
     BRDCARDSPOT: .res 1
@@ -51,6 +55,7 @@ set_new_cursor_pos:
         ;moving_up:
         ; get next position to check
         lda CURSORNEWY
+        cmp UPLIMIT
         beq up_limit
             sec 
             sbc #1
@@ -68,7 +73,7 @@ set_new_cursor_pos:
         ;moving_right:
         ; get next position to check
         lda CURSORNEWX
-        cmp #13
+        cmp RIGHTLIMIT
         beq right_limit
             clc 
             adc #1
@@ -86,7 +91,7 @@ set_new_cursor_pos:
         ;moving_down
         ; get next position to check
         lda CURSORNEWY
-        cmp #9
+        cmp DOWNLIMIT
         beq down_limit
             clc  
             adc #1
@@ -101,6 +106,7 @@ set_new_cursor_pos:
         ;moving_left:
         ; get next position to check
         lda CURSORNEWX
+        cmp LEFTLIMIT
         beq left_limit
             sec 
             sbc #1

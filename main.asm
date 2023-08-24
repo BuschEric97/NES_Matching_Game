@@ -159,6 +159,15 @@ game_loop:
             jsr draw_board
             lda #1
             sta GAMEFLAG    ; set GAMEFLAG to 1 to indicate a game is being played
+
+            ; set max level board limits
+            lda #0
+            sta UPLIMIT
+            sta LEFTLIMIT
+            lda #13
+            sta RIGHTLIMIT
+            lda #9
+            sta DOWNLIMIT
     start_not_pressed:
 
     ;---------------------------;
