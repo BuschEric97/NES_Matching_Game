@@ -4,6 +4,8 @@
 .segment "ZEROPAGE"
     GAMEBOARDDATA: .res 140     ; 1 byte for each card on the board (a card ID of $00 means the card is gone)
     SHOWCARDSBUFFER: .res 1     ; When greater than 0, decrement and skip game logic (in order to show the selected cards)
+    MOVEMENTBUFFER: .res 1      ; When greater than 0, decrement and disallow movement via holding down dpad direction
+    FIRSTMOVBUFFER: .res 1      ; When greater than 0, decrement and disallow movement via holding down dpad direction
     GAMEFLAG: .res 1            ; Flag to indicate when a game is being played
     LEVELFLAG: .res 1           ; Variable to indicate which difficulty the game is being played at
     SCOREMISSES: .res 4         ; Variable to track how many unsuccessful matches have been made
@@ -34,51 +36,145 @@ game_loop:
     inx 
     stx seed+1
 
+    ; decrement movement buffer if above 0
+    lda MOVEMENTBUFFER
+    beq mov_buffer_is_0
+        ldx MOVEMENTBUFFER
+        dex 
+        stx MOVEMENTBUFFER
+    mov_buffer_is_0:
+
+    ; decrement first movement buffer if above 0
+    lda FIRSTMOVBUFFER
+    beq first_mov_buffer_is_0
+        ldx FIRSTMOVBUFFER
+        dex 
+        stx FIRSTMOVBUFFER
+    first_mov_buffer_is_0:
+
     ; get gamepad input
     jsr set_gamepad
 
     ; skip cursor code when game is not running
     lda GAMEFLAG
-    beq skip_cursor
+    bne do_cursor_logic
+        jmp skip_cursor
+    do_cursor_logic:
 
     ;-------------------;
     ; Move Cursor Code  ;
     ;-------------------;
     ; see if dpad UP was pressed
-    lda gamepad_new_press
+    lda gamepad_press
     and PRESS_UP
     cmp PRESS_UP
     bne up_not_pressed
-        lda #0
-        sta CURSORNEWDIR
-        jsr set_new_cursor_pos
+        lda gamepad_last_press
+        and PRESS_UP
+        cmp PRESS_UP
+        bne check_new_up
+            lda MOVEMENTBUFFER
+            bne up_not_pressed  ; skip movement if holding down direction and buffer is greater than 0
+                lda FIRSTMOVBUFFER
+                bne up_not_pressed
+                    jmp move_up
+        check_new_up:
+            lda gamepad_new_press
+            and PRESS_UP
+            cmp PRESS_UP
+            bne up_not_pressed
+                lda #$10
+                sta FIRSTMOVBUFFER
+        move_up:
+            lda #0
+            sta CURSORNEWDIR
+            jsr set_new_cursor_pos
+            lda #$04
+            sta MOVEMENTBUFFER
     up_not_pressed:
     ; see if dpad RIGHT was pressed
-    lda gamepad_new_press
+    lda gamepad_press
     and PRESS_RIGHT
     cmp PRESS_RIGHT
     bne right_not_pressed
-        lda #1
-        sta CURSORNEWDIR
-        jsr set_new_cursor_pos
+        lda gamepad_last_press
+        and PRESS_RIGHT
+        cmp PRESS_RIGHT
+        bne check_new_right
+            lda MOVEMENTBUFFER
+            bne right_not_pressed  ; skip movement if holding down direction and buffer is greater than 0
+                lda FIRSTMOVBUFFER
+                bne right_not_pressed
+                    jmp move_right
+        check_new_right:
+            lda gamepad_new_press
+            and PRESS_RIGHT
+            cmp PRESS_RIGHT
+            bne right_not_pressed
+                lda #$10
+                sta FIRSTMOVBUFFER
+        move_right:
+            lda #1
+            sta CURSORNEWDIR
+            jsr set_new_cursor_pos
+            lda #$04
+            sta MOVEMENTBUFFER
     right_not_pressed:
     ; see if dpad DOWN was pressed
-    lda gamepad_new_press
+    lda gamepad_press
     and PRESS_DOWN
     cmp PRESS_DOWN
     bne down_not_pressed
-        lda #2
-        sta CURSORNEWDIR
-        jsr set_new_cursor_pos
+        lda gamepad_last_press
+        and PRESS_DOWN
+        cmp PRESS_DOWN
+        bne check_new_down
+            lda MOVEMENTBUFFER
+            bne down_not_pressed  ; skip movement if holding down direction and buffer is greater than 0
+                lda FIRSTMOVBUFFER
+                bne down_not_pressed
+                    jmp move_down
+        check_new_down:
+            lda gamepad_new_press
+            and PRESS_DOWN
+            cmp PRESS_DOWN
+            bne down_not_pressed
+                lda #$10
+                sta FIRSTMOVBUFFER
+        move_down:
+            lda #2
+            sta CURSORNEWDIR
+            jsr set_new_cursor_pos
+            lda #$04
+            sta MOVEMENTBUFFER
     down_not_pressed:
     ; see if dpad LEFT was pressed
-    lda gamepad_new_press
+    lda gamepad_press
     and PRESS_LEFT
     cmp PRESS_LEFT
     bne left_not_pressed
-        lda #3
-        sta CURSORNEWDIR
-        jsr set_new_cursor_pos
+        lda gamepad_last_press
+        and PRESS_LEFT
+        cmp PRESS_LEFT
+        bne check_new_left
+            lda MOVEMENTBUFFER
+            bne left_not_pressed  ; skip movement if holding down direction and buffer is greater than 0
+                lda FIRSTMOVBUFFER
+                bne left_not_pressed
+                    jmp move_left
+        check_new_left:
+            lda gamepad_new_press
+            and PRESS_LEFT
+            cmp PRESS_LEFT
+            bne left_not_pressed
+                lda #$10
+                sta FIRSTMOVBUFFER
+        move_left:
+            lda #3
+            sta CURSORNEWDIR
+            jsr set_new_cursor_pos
+            lda #$04
+            sta MOVEMENTBUFFER
     left_not_pressed:
 
     ; always draw the cursor when a game is being played
